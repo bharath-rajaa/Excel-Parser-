@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Data Parser</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #bbffe8;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: auto;
+            border: 5px solid black;
+            background: rgb(137, 136, 136);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        .container h2{
+            font-size: 40px;
+        }
+        .container p, p{
+            font-size: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 20px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #f4720f;
+            color: rgb(4, 4, 4);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #128C7E;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        th,
+        td {
+            border: 3px solid #000000;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            height: 14px;
+            width: 120px;
+        }
+
+        .copy-hint {
+            color: #050505;
+            font-size: 20px;
+            margin-top: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container h2 {
+                font-size: 30px;
+            }
+            .container p {
+                font-size: 20px;
+            }
+            textarea {
+                height: 300px;
+                font-size: 16px;
+            }
+            table {
+                font-size: 16px;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container h2 {
+                font-size: 25px;
+            }
+            .container p {
+                font-size: 18px;
+            }
+            textarea {
+                height: 250px;
+                font-size: 14px;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Excel Parser</h2>
+        <p>Make the excel easier to the world<br>Give your data without leaving one line space to the data 
+        </p>
+        <textarea id="inputData" placeholder="Paste Your Data"></textarea>
+        <button onclick="parseData()">Parse Data</button>
+        <p class="copy-hint">Your result is below just copy and paste in your Excel file</p>
+
+        <table id="resultTable">
+            <thead>
+                <!-- Change according to your data as per cell heading -->
+                <tr>
+                    <!-- <th></th> -->
+                </tr> 
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+<footer>
+        <p>&copy All rights are reserved. </p>
+</footer>
+    <script>
+    function parseData() {
+        const text = document.getElementById('inputData').value;
+        const body = document.getElementById('tableBody');
+        const thead = document.querySelector('thead tr');
+
+        // Split the input text into multiple entries based on double newlines
+        const entries = text.split('\n\n');
+        if (entries.length === 0) return;
+
+        // Extract headings from the first entry
+        const firstEntry = entries[0];
+        const headingRegex = /([^:\n]+?):(?!\/\/)/g;
+        const headings = firstEntry.match(headingRegex);
+
+        // Update table headings if headings are found
+        if (headings && headings.length > 0) {
+            let newHeadingsHTML = '';
+            headings.forEach(heading => {
+                const cleanHeading = heading.replace(':', '').trim();
+                newHeadingsHTML += `<th>${cleanHeading}</th>`;
+            });
+            thead.innerHTML = newHeadingsHTML;
+        }
+
+        // Process each entry to populate the table body
+        let rows = '';
+        entries.forEach(entry => {
+            if (entry.trim() === '') return;
+            let row = "<tr>";
+
+            // Extract values for each heading
+            headings.forEach(heading => {
+                const cleanHeading = heading.replace(':', '').trim();
+                // Updated regex to handle URLs and avoid splitting on colons in URLs
+                const regex = new RegExp(`${cleanHeading}:?\s*(.*?)(?=\s*\n|\s*${headings.join('|')}|$)`, "i");
+                const match = entry.match(regex);
+                let value = match ? match[1].trim() : "";
+                 
+                // Replace colons in URLs with HTML entities to prevent splitting
+                value = value.replace(/https?:\/\/[^\s]+/g, (url) => {
+                    return url.replace(/:/g, '&#58;');
+                });
+                 
+                row += `<td>${value}</td>`;
+            });
+
+            row += "</tr>";
+            rows += row;
+        });
+
+        body.innerHTML = rows;
+    }
+</script>
+</body>
+</html>
