@@ -69,8 +69,9 @@ To deploy the application on your mobile device, follow these steps:
 ## Usage
 1. Open the application in a web browser or on your mobile device.
 2. Paste your Excel data into the textarea provided.
-3. Click the "Parse Data" button to convert the data into a structured table format.
-4. Copy the parsed data from the table and paste it into your Excel file.
+3. NOTE: Make sure that your Data is in JSON Format or use the ":" to make the data Key & Value. For Example Key:Value, Fruit:Apple,...etc
+4. Click the "Parse Data" button to convert the data into a structured table format.
+5. Copy the parsed data from the table and paste it into your Excel file.
 
 ## Support
 If you encounter any issues or have any questions, please feel free to reach out for support.
